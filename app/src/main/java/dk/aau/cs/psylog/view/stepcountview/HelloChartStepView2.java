@@ -1,23 +1,15 @@
 package dk.aau.cs.psylog.view.stepcountview;
 
-import android.app.ActionBar;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
-import android.view.ViewGroup;
-
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
-import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import dk.aau.cs.psylog.module_lib.DBAccessContract;
-import lecho.lib.hellocharts.formatter.AxisValueFormatter;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
@@ -29,28 +21,14 @@ import lecho.lib.hellocharts.view.LineChartView;
 /**
  * Created by Praetorian on 23-03-2015.
  */
-public class HelloChartStepView extends LineChartView {
+public class HelloChartStepView2 extends LineChartView {
 
     ContentResolver contentResolver;
-    public HelloChartStepView(Context context) {
+    public HelloChartStepView2(Context context) {
         super(context);
         contentResolver = context.getContentResolver();
         this.setInteractive(true);
         this.setZoomType(ZoomType.HORIZONTAL);
-/*
-        List<PointValue> values = new ArrayList<PointValue>();
-        values.add(new PointValue(0, 2));
-        values.add(new PointValue(1, 4));
-        values.add(new PointValue(2, 3));
-        values.add(new PointValue(3, 4));*/
-
-        //In most cased you can call data model methods in builder-pattern-like manner.
-
-
-
-
-      //  LineChartView chart = new LineChartView(context);
-    //    chart.setLineChartData(data);
         this.setLineChartData(setupChart());
     }
 
@@ -89,14 +67,19 @@ public class HelloChartStepView extends LineChartView {
         try {
             ArrayList<PointValue> returnList = new ArrayList<>();
             Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "STEPCOUNTER_steps");
-
             Cursor cursor = contentResolver.query(uri, new String[]{"stepcount", "time"}, null, null, null);
             int i = 0;
+            final int blockSize = 10;
             if (cursor.moveToFirst()) {
+                int currentBlock = 0;
                 do {
                     int stepCount = cursor.getInt(cursor.getColumnIndex("stepcount"));
                     String time = cursor.getString(cursor.getColumnIndex("time"));
-                    returnList.add(new PointValue(i, stepCount).setLabel(time));
+                    currentBlock += stepCount;
+                    if(i % blockSize == 0) {
+                        returnList.add(new PointValue(i, currentBlock).setLabel(time));
+                        currentBlock = 0;
+                    }
                     i++;
                 }
                 while (cursor.moveToNext());
