@@ -69,7 +69,8 @@ public class HelloChartStepView2 extends LineChartView {
             Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "STEPCOUNTER_steps");
             Cursor cursor = contentResolver.query(uri, new String[]{"stepcount", "time"}, null, null, null);
             int i = 0;
-            final int blockSize = 10;
+            final int blockSize = 5;
+            int index = 0;
             if (cursor.moveToFirst()) {
                 int currentBlock = 0;
                 do {
@@ -77,7 +78,7 @@ public class HelloChartStepView2 extends LineChartView {
                     String time = cursor.getString(cursor.getColumnIndex("time"));
                     currentBlock += stepCount;
                     if(i % blockSize == 0) {
-                        returnList.add(new PointValue(i, currentBlock).setLabel(time));
+                        returnList.add(new PointValue(index++, currentBlock).setLabel(time));
                         currentBlock = 0;
                     }
                     i++;

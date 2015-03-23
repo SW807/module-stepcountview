@@ -92,6 +92,7 @@ public class HelloChartStepView extends LineChartView {
 
             Cursor cursor = contentResolver.query(uri, new String[]{"stepcount", "time"}, null, null, null);
             int i = 0;
+
             if (cursor.moveToFirst()) {
                 do {
                     int stepCount = cursor.getInt(cursor.getColumnIndex("stepcount"));
