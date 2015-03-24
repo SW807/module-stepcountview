@@ -18,9 +18,7 @@ import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.view.LineChartView;
 
-/**
- * Created by Praetorian on 23-03-2015.
- */
+
 public class HelloChartStepView2 extends LineChartView {
 
     ContentResolver contentResolver;
