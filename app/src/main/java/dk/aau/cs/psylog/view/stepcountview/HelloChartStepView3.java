@@ -13,43 +13,32 @@ import dk.aau.cs.psylog.module_lib.DBAccessContract;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
+import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.ColumnChartData;
 import lecho.lib.hellocharts.model.PointValue;
-import lecho.lib.hellocharts.view.LineChartView;
+import lecho.lib.hellocharts.model.SubcolumnValue;
+import lecho.lib.hellocharts.view.ColumnChartView;
 
 /**
  * Created by Praetorian on 23-03-2015.
  */
-public class HelloChartStepView2 extends LineChartView {
+public class HelloChartStepView3 extends ColumnChartView {
 
     ContentResolver contentResolver;
-    public HelloChartStepView2(Context context) {
+    public HelloChartStepView3(Context context) {
         super(context);
         contentResolver = context.getContentResolver();
         this.setInteractive(true);
         this.setZoomType(ZoomType.HORIZONTAL);
-        this.setLineChartData(setupChart());
+        this.setColumnChartData(setupChart());
     }
 
-    public LineChartData setupChart() {
-        Line line = new Line(getDBData()).setColor(Color.BLUE).setCubic(false);
-        List<Line> lines = new ArrayList<Line>();
-        lines.add(line);
-
-        LineChartData data = new LineChartData();
+    public ColumnChartData setupChart() {
+        ColumnChartData data = new ColumnChartData();
         data.setBaseValue(Float.NEGATIVE_INFINITY);
-        data.setLines(lines);
+        data.setColumns(getDBData());
         List<AxisValue> axisValues = new ArrayList<AxisValue>();
-        int i = 0;
-        for(PointValue p : line.getValues()) {
-            if(i % 5 == 0) {
-                String label = String.valueOf(p.getLabelAsChars());
-                axisValues.add(new AxisValue(i).setLabel(label));
-            }
-
-            i++;
-        }
         Axis axisX = new Axis(axisValues).setHasLines(true);
         axisX.setTextSize(8);
 
@@ -62,26 +51,19 @@ public class HelloChartStepView2 extends LineChartView {
         return data;
     }
 
-    public ArrayList<PointValue> getDBData()
+    public ArrayList<Column> getDBData()
     {
         try {
-            ArrayList<PointValue> returnList = new ArrayList<>();
+            ArrayList<Column> returnList = new ArrayList<>();
             Uri uri = Uri.parse(DBAccessContract.DBACCESS_CONTENTPROVIDER + "STEPCOUNTER_steps");
             Cursor cursor = contentResolver.query(uri, new String[]{"stepcount", "time"}, null, null, null);
             int i = 0;
-            final int blockSize = 5;
-            int index = 0;
             if (cursor.moveToFirst()) {
-                int currentBlock = 0;
                 do {
                     int stepCount = cursor.getInt(cursor.getColumnIndex("stepcount"));
                     String time = cursor.getString(cursor.getColumnIndex("time"));
-                    currentBlock += stepCount;
-                    if(i % blockSize == 0) {
-                        returnList.add(new PointValue(index++, currentBlock).setLabel(time));
-                        currentBlock = 0;
-                    }
-                    i++;
+                    Column c = new Column(new ArrayList<SubcolumnValue>(stepCount));
+                    returnList.add(c);
                 }
                 while (cursor.moveToNext());
 
